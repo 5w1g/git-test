@@ -77,7 +77,7 @@
   /* ── header ── */
   .header {
     display: flex; justify-content: space-between; align-items: flex-start;
-    margin-bottom: 48px;
+    margin-bottom: 32px;
     flex-wrap: wrap; gap: 16px;
   }
   .header-left h1 {
@@ -91,6 +91,45 @@
     color: var(--text-secondary); font-size: 14px;
     text-align: right; line-height: 1.5;
   }
+
+  /* ── tab bar ── */
+  .tab-bar {
+    display: flex; gap: 0;
+    margin-bottom: 32px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 28px;
+    padding: 4px;
+    width: fit-content;
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    animation: fade-up 0.6s ease-out;
+  }
+  .tab-btn {
+    padding: 10px 28px;
+    border-radius: 24px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    letter-spacing: -0.1px;
+  }
+  .tab-btn.active {
+    background: rgba(255,255,255,0.12);
+    color: var(--text);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .tab-btn:hover:not(.active) {
+    color: #ccc;
+  }
+
+  /* ── views ── */
+  .view { display: none; }
+  .view.active { display: block; }
 
   /* ── hero card ── */
   .hero {
@@ -219,6 +258,112 @@
     font-size: 13px; color: var(--text-secondary); margin-top: 4px;
   }
 
+  /* ── month view ── */
+  .month-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 24px;
+  }
+  .month-header h2 {
+    font-size: 24px; font-weight: 600; letter-spacing: -0.3px;
+  }
+  .month-nav {
+    display: flex; gap: 8px;
+  }
+  .month-nav button {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--text);
+    font-size: 16px; cursor: pointer;
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    transition: background 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .month-nav button:hover { background: rgba(255,255,255,0.12); }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    animation: fade-up 0.6s ease-out;
+  }
+  .cal-day-header {
+    text-align: center;
+    font-size: 12px; font-weight: 500; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--text-tertiary);
+    padding: 8px 0;
+  }
+  .cal-cell {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 10px 8px 12px;
+    min-height: 110px;
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    transition: transform 0.2s ease, background 0.2s ease;
+    cursor: default;
+    display: flex; flex-direction: column;
+  }
+  .cal-cell:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,0.09);
+  }
+  .cal-cell.today {
+    background: rgba(41,151,255,0.12);
+    border-color: rgba(41,151,255,0.25);
+  }
+  .cal-cell.empty {
+    background: transparent;
+    border-color: transparent;
+    pointer-events: none;
+  }
+  .cal-cell.future-no-data {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+  .cal-date {
+    font-size: 13px; font-weight: 500; color: var(--text-secondary);
+    margin-bottom: 4px;
+  }
+  .cal-cell.today .cal-date {
+    color: var(--accent); font-weight: 600;
+  }
+  .cal-icon {
+    font-size: 24px; line-height: 1; margin: 2px 0;
+  }
+  .cal-temps {
+    font-size: 11px; color: var(--text-secondary);
+    display: flex; gap: 6px; margin-top: auto;
+  }
+  .cal-temps .hi { font-weight: 500; color: #f5f5f7; }
+  .cal-rain {
+    font-size: 10px; color: var(--accent-rain); margin-top: 2px;
+  }
+
+  /* ── month summary card ── */
+  .month-summary {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px; margin-top: 24px;
+  }
+  .month-stat {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 20px;
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+  }
+  .month-stat-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--text-tertiary); margin-bottom: 8px; font-weight: 500;
+  }
+  .month-stat-value {
+    font-size: 26px; font-weight: 300; letter-spacing: -0.5px;
+  }
+
   /* ── footer ── */
   .footer {
     margin-top: 48px; text-align: center;
@@ -237,6 +382,10 @@
     .hero-details { grid-template-columns: 1fr 1fr; gap: 16px; }
     .forecast { grid-template-columns: repeat(4, 1fr); }
     .extras { grid-template-columns: repeat(2, 1fr); }
+    .calendar-grid { gap: 4px; }
+    .cal-cell { min-height: 90px; padding: 8px 6px 10px; border-radius: 10px; }
+    .cal-icon { font-size: 20px; }
+    .month-summary { grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 600px) {
     .container { padding: 24px 16px 60px; }
@@ -245,6 +394,12 @@
     .forecast { grid-template-columns: repeat(3, 1fr); }
     .extras { grid-template-columns: 1fr 1fr; }
     .header { flex-direction: column; }
+    .calendar-grid { gap: 3px; }
+    .cal-cell { min-height: 72px; padding: 6px 4px 8px; border-radius: 8px; }
+    .cal-icon { font-size: 16px; }
+    .cal-temps { font-size: 10px; gap: 4px; }
+    .cal-date { font-size: 11px; }
+    .cal-rain { font-size: 9px; }
   }
 </style>
 </head>
@@ -269,19 +424,41 @@
     </div>
   </header>
 
-  <section class="hero" id="hero">
-    <div>
-      <div id="hero-temp" class="hero-temp"></div>
-      <div id="hero-condition" class="hero-condition"></div>
-      <div id="hero-hilo" class="hero-hilo"></div>
+  <!-- ── tab bar ── -->
+  <nav class="tab-bar" id="tab-bar">
+    <button class="tab-btn active" data-view="week">Week</button>
+    <button class="tab-btn" data-view="month">Month</button>
+  </nav>
+
+  <!-- ── week view ── -->
+  <div class="view active" id="view-week">
+    <section class="hero" id="hero">
+      <div>
+        <div id="hero-temp" class="hero-temp"></div>
+        <div id="hero-condition" class="hero-condition"></div>
+        <div id="hero-hilo" class="hero-hilo"></div>
+      </div>
+      <div class="hero-details" id="hero-details"></div>
+    </section>
+
+    <h2 class="section-title">This Week</h2>
+    <section class="forecast" id="forecast"></section>
+
+    <section class="extras" id="extras"></section>
+  </div>
+
+  <!-- ── month view ── -->
+  <div class="view" id="view-month">
+    <div class="month-header">
+      <h2 id="month-title"></h2>
+      <div class="month-nav">
+        <button id="month-prev" title="Previous month">←</button>
+        <button id="month-next" title="Next month">→</button>
+      </div>
     </div>
-    <div class="hero-details" id="hero-details"></div>
-  </section>
-
-  <h2 class="section-title">This Week</h2>
-  <section class="forecast" id="forecast"></section>
-
-  <section class="extras" id="extras"></section>
+    <div class="calendar-grid" id="calendar-grid"></div>
+    <section class="month-summary" id="month-summary"></section>
+  </div>
 
   <footer class="footer">Data via Open-Meteo · Updated live</footer>
 
@@ -317,16 +494,17 @@ const WMO = {
 };
 
 const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+// ─── globals ───
+let weekData = null;
+let monthForecastData = null;
+let calYear, calMonth;
 
 // ─── helpers ───
 function weatherLabel(code) {
   return WMO[code] || { icon:'🌤️', label:'Partly Cloudy' };
-}
-
-function dayName(iso) {
-  const d = new Date(iso + 'T00:00:00');
-  return DAYS[d.getDay()];
 }
 
 function isToday(iso) {
@@ -336,36 +514,67 @@ function isToday(iso) {
 }
 
 function formatDate(d) {
-  const day = DAYS[d.getDay()];
-  const date = d.getDate();
-  const month = MONTHS[d.getMonth()];
-  return `${day}, ${month} ${date}`;
+  return `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}`;
 }
 
 function windDir(speed) {
   return speed > 30 ? 'Gusty' : speed > 15 ? 'Breezy' : 'Light';
 }
 
-// ─── fetch live weather ───
-async function fetchWeather() {
+function uvLevel(v) {
+  if (v <= 2) return 'Low';
+  if (v <= 5) return 'Moderate';
+  if (v <= 7) return 'High';
+  if (v <= 10) return 'Very High';
+  return 'Extreme';
+}
+
+// ─── API fetch ───
+async function fetchWeekWeather() {
   const url = 'https://api.open-meteo.com/v1/forecast'
     + '?latitude=-36.85&longitude=174.76'
     + '&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,rain_sum,showers_sum,snowfall_sum,weather_code,wind_speed_10m_max,wind_gusts_10m_max,relative_humidity_2m_max,uv_index_max'
     + '&timezone=Pacific%2FAuckland&forecast_days=7';
-
   const res = await fetch(url);
-  const data = await res.json();
-  return data.daily;
+  return (await res.json()).daily;
 }
 
-// ─── render ───
-function render(data) {
+async function fetchMonthWeather() {
+  const url = 'https://api.open-meteo.com/v1/forecast'
+    + '?latitude=-36.85&longitude=174.76'
+    + '&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,rain_sum,showers_sum,snowfall_sum,weather_code,wind_speed_10m_max,wind_gusts_10m_max,relative_humidity_2m_max,uv_index_max'
+    + '&timezone=Pacific%2FAuckland&forecast_days=16';
+  const res = await fetch(url);
+  return (await res.json()).daily;
+}
+
+// ─── build forecast lookup ───
+function buildForecastMap(data) {
+  const map = {};
+  data.time.forEach((t, i) => {
+    map[t] = {
+      hi: Math.round(data.temperature_2m_max[i]),
+      lo: Math.round(data.temperature_2m_min[i]),
+      code: data.weather_code[i],
+      precip: data.precipitation_sum[i],
+      rain: data.rain_sum[i],
+      showers: data.showers_sum[i],
+      snow: data.snowfall_sum[i],
+      wind: Math.round(data.wind_speed_10m_max[i]),
+      humidity: Math.round(data.relative_humidity_2m_max[i]),
+      uv: Math.round(data.uv_index_max[i]),
+    };
+  });
+  return map;
+}
+
+// ─── render week view ───
+function renderWeek(data) {
   const now = new Date();
   document.getElementById('date').textContent = formatDate(now);
   document.getElementById('time').textContent =
     now.toLocaleTimeString('en-NZ', { timeZone: 'Pacific/Auckland', hour:'2-digit',minute:'2-digit' });
 
-  // hero
   const todayIdx = data.time.findIndex(t => isToday(t));
   const idx = todayIdx >= 0 ? todayIdx : 0;
   const t = data;
@@ -392,13 +601,12 @@ function render(data) {
     </div>
   `).join('');
 
-  // forecast
   document.getElementById('forecast').innerHTML = data.time.map((date, i) => {
     const w = weatherLabel(data.weather_code[i]);
     const today = isToday(date);
     return `
       <div class="day-card${today ? ' today' : ''}">
-        <div class="day-name">${today ? 'Today' : dayName(date).slice(0,3)}</div>
+        <div class="day-name">${today ? 'Today' : DAYS[new Date(date+'T00:00:00').getDay()].slice(0,3)}</div>
         <div class="day-icon">${w.icon}</div>
         <div class="day-temp">${Math.round(data.temperature_2m_max[i])}°</div>
         <div class="day-lo">${Math.round(data.temperature_2m_min[i])}°</div>
@@ -411,7 +619,6 @@ function render(data) {
     `;
   }).join('');
 
-  // extras
   const gusts = Math.round(Math.max(...data.wind_gusts_10m_max));
   const totalRain = Math.round(data.precipitation_sum.reduce((a,b) => a+b, 0) * 10) / 10;
   const avgHumidity = Math.round(data.relative_humidity_2m_max.reduce((a,b) => a+b, 0) / 7);
@@ -431,19 +638,122 @@ function render(data) {
   `).join('');
 }
 
-function uvLevel(v) {
-  if (v <= 2) return 'Low';
-  if (v <= 5) return 'Moderate';
-  if (v <= 7) return 'High';
-  if (v <= 10) return 'Very High';
-  return 'Extreme';
+// ─── render month view ───
+function renderMonth(forecastMap) {
+  document.getElementById('month-title').textContent =
+    `${MONTHS[calMonth]} ${calYear}`;
+
+  const grid = document.getElementById('calendar-grid');
+
+  // day-of-week headers
+  let html = DAYS_SHORT.map(d => `<div class="cal-day-header">${d}</div>`).join('');
+
+  // first day of month + last day of month
+  const firstDay = new Date(calYear, calMonth, 1);
+  const lastDay = new Date(calYear, calMonth + 1, 0);
+  const startDow = firstDay.getDay(); // 0=Sun
+  const daysInMonth = lastDay.getDate();
+
+  const today = new Date();
+  const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+  // empty cells before first of month
+  for (let i = 0; i < startDow; i++) {
+    html += '<div class="cal-cell empty"></div>';
+  }
+
+  // day cells
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateKey = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const fc = forecastMap[dateKey];
+    const isTodayCell = dateKey === todayKey;
+
+    if (!fc) {
+      const isPast = new Date(calYear, calMonth, d) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      html += `<div class="cal-cell${isPast ? ' empty' : ' future-no-data'}">
+        <div class="cal-date">${d}</div>
+        <div class="cal-icon" style="font-size:18px;margin-top:8px">${isPast ? '' : '—'}</div>
+      </div>`;
+    } else {
+      const w = weatherLabel(fc.code);
+      html += `
+        <div class="cal-cell${isTodayCell ? ' today' : ''}">
+          <div class="cal-date">${d}</div>
+          <div class="cal-icon">${w.icon}</div>
+          <div class="cal-temps">
+            <span class="hi">${fc.hi}°</span>
+            <span>${fc.lo}°</span>
+          </div>
+          ${fc.precip > 0 ? `<div class="cal-rain">💧 ${fc.precip} mm</div>` : ''}
+        </div>
+      `;
+    }
+  }
+
+  grid.innerHTML = html;
+
+  // month summary
+  const fcValues = Object.values(forecastMap);
+  const monthHi = fcValues.length ? Math.max(...fcValues.map(f => f.hi)) : '—';
+  const monthLo = fcValues.length ? Math.min(...fcValues.map(f => f.lo)) : '—';
+  const monthRain = fcValues.length ? Math.round(fcValues.reduce((s,f) => s + f.precip, 0) * 10) / 10 : '—';
+  const rainyDays = fcValues.filter(f => f.precip > 0).length;
+
+  document.getElementById('month-summary').innerHTML = [
+    { label:'Highest', value:`${monthHi}°`, sub:'' },
+    { label:'Lowest', value:`${monthLo}°`, sub:'' },
+    { label:'Total Rain', value:`${monthRain}`, unit:'mm', sub:`${rainyDays} rainy days` },
+    { label:'Forecast Days', value:`${fcValues.length}`, unit:'', sub:'in range' },
+  ].map(d => `
+    <div class="month-stat">
+      <div class="month-stat-label">${d.label}</div>
+      <div class="month-stat-value">${d.value}${d.unit ? ` <span style="font-size:14px;color:var(--text-secondary)">${d.unit}</span>` : ''}</div>
+      <div style="font-size:12px;color:var(--text-tertiary);margin-top:4px">${d.sub}</div>
+    </div>
+  `).join('');
 }
+
+// ─── tab switching ───
+function switchView(view) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-view="${view}"]`).classList.add('active');
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(`view-${view}`).classList.add('active');
+}
+
+document.getElementById('tab-bar').addEventListener('click', e => {
+  if (!e.target.classList.contains('tab-btn')) return;
+  switchView(e.target.dataset.view);
+});
+
+// ─── month navigation ───
+document.getElementById('month-prev').addEventListener('click', () => {
+  calMonth--;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderMonth(buildForecastMap(monthForecastData));
+});
+document.getElementById('month-next').addEventListener('click', () => {
+  calMonth++;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderMonth(buildForecastMap(monthForecastData));
+});
 
 // ─── boot ───
 (async () => {
   try {
-    const data = await fetchWeather();
-    render(data);
+    const now = new Date();
+    calYear = now.getFullYear();
+    calMonth = now.getMonth();
+
+    const [week, monthFc] = await Promise.all([
+      fetchWeekWeather(),
+      fetchMonthWeather(),
+    ]);
+    weekData = week;
+    monthForecastData = monthFc;
+
+    renderWeek(week);
+    renderMonth(buildForecastMap(monthFc));
   } catch (e) {
     console.error('Weather fetch failed', e);
     document.getElementById('hero').innerHTML = '<p style="padding:40px">Unable to load weather data. Check your connection.</p>';
