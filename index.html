@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather — Auckland</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --card-bg: rgba(255,255,255,0.06);
+    --card-border: rgba(255,255,255,0.08);
+    --text: #f5f5f7;
+    --text-secondary: #86868b;
+    --text-tertiary: #6e6e73;
+    --accent: #2997ff;
+    --accent-rain: #5e9eff;
+    --divider: rgba(255,255,255,0.1);
+    --radius: 20px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  /* ── animated background ── */
+  .bg-layer {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  }
+  .bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.15;
+    animation: orb-drift 20s ease-in-out infinite alternate;
+  }
+  .bg-orb:nth-child(1) {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, #2997ff, transparent);
+    top: -200px; left: -100px;
+    animation-delay: 0s;
+  }
+  .bg-orb:nth-child(2) {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, #5e9eff, transparent);
+    bottom: -200px; right: -100px;
+    animation-delay: -7s;
+  }
+  .bg-orb:nth-child(3) {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #30d158, transparent);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation-delay: -14s;
+  }
+
+  @keyframes orb-drift {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(40px, -30px) scale(1.15); }
+  }
+
+  /* ── layout ── */
+  .container {
+    position: relative; z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* ── header ── */
+  .header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 48px;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .header-left h1 {
+    font-size: 28px; font-weight: 600; letter-spacing: -0.2px;
+  }
+  .header-left .date {
+    color: var(--text-secondary); font-size: 17px;
+    margin-top: 4px; font-weight: 400;
+  }
+  .header-right {
+    color: var(--text-secondary); font-size: 14px;
+    text-align: right; line-height: 1.5;
+  }
+
+  /* ── hero card ── */
+  .hero {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 48px 40px;
+    margin-bottom: 24px;
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 32px;
+    animation: fade-up 0.8s ease-out;
+  }
+  .hero-temp {
+    font-size: 120px; font-weight: 200;
+    letter-spacing: -5px; line-height: 1;
+    background: linear-gradient(180deg, #f5f5f7 0%, #86868b 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-unit {
+    font-size: 32px; font-weight: 300; color: var(--text-secondary);
+    vertical-align: super; -webkit-text-fill-color: var(--text-secondary);
+  }
+  .hero-condition {
+    font-size: 20px; font-weight: 500; color: var(--text-secondary);
+    margin-top: 8px;
+  }
+  .hero-hilo {
+    display: flex; gap: 20px; margin-top: 8px;
+    font-size: 16px; color: var(--text-secondary);
+  }
+  .hero-hilo .hi { color: #f5f5f7; font-weight: 500; }
+  .hero-hilo .lo { color: var(--text-tertiary); }
+  .hero-details {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 20px 48px;
+  }
+  .detail-item {
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .detail-label {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px;
+    color: var(--text-tertiary); font-weight: 500;
+  }
+  .detail-value {
+    font-size: 28px; font-weight: 300; letter-spacing: -0.5px;
+  }
+  .detail-unit {
+    font-size: 14px; color: var(--text-secondary); font-weight: 400;
+  }
+
+  /* ── forecast row ── */
+  .section-title {
+    font-size: 20px; font-weight: 600; letter-spacing: -0.2px;
+    margin: 48px 0 16px;
+  }
+  .forecast {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 12px;
+    animation: fade-up 0.8s ease-out 0.2s both;
+  }
+  .day-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    text-align: center;
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    transition: transform 0.3s ease, background 0.3s ease;
+    cursor: default;
+  }
+  .day-card:hover {
+    transform: translateY(-4px);
+    background: rgba(255,255,255,0.09);
+  }
+  .day-card.today {
+    background: rgba(41,151,255,0.12);
+    border-color: rgba(41,151,255,0.25);
+  }
+  .day-name {
+    font-size: 13px; font-weight: 500; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;
+  }
+  .day-icon {
+    font-size: 36px; margin-bottom: 8px; line-height: 1;
+    filter: drop-shadow(0 0 12px rgba(255,255,255,0.1));
+  }
+  .day-temp {
+    font-size: 18px; font-weight: 500; letter-spacing: -0.3px;
+  }
+  .day-lo {
+    font-size: 13px; color: var(--text-tertiary); margin-top: 2px;
+  }
+  .day-stats {
+    margin-top: 12px; font-size: 11px; color: var(--text-tertiary);
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .day-stats span { display: flex; align-items: center; justify-content: center; gap: 4px; }
+
+  /* ── extra cards ── */
+  .extras {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px; margin-top: 24px;
+    animation: fade-up 0.8s ease-out 0.4s both;
+  }
+  .extra-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+  }
+  .extra-label {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--text-tertiary); margin-bottom: 12px; font-weight: 500;
+  }
+  .extra-value {
+    font-size: 32px; font-weight: 300; letter-spacing: -1px;
+  }
+  .extra-sub {
+    font-size: 13px; color: var(--text-secondary); margin-top: 4px;
+  }
+
+  /* ── footer ── */
+  .footer {
+    margin-top: 48px; text-align: center;
+    color: var(--text-tertiary); font-size: 12px;
+  }
+
+  /* ── animations ── */
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── responsive ── */
+  @media (max-width: 900px) {
+    .hero-temp { font-size: 80px; }
+    .hero-details { grid-template-columns: 1fr 1fr; gap: 16px; }
+    .forecast { grid-template-columns: repeat(4, 1fr); }
+    .extras { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .container { padding: 24px 16px 60px; }
+    .hero { padding: 32px 20px; }
+    .hero-temp { font-size: 64px; letter-spacing: -3px; }
+    .forecast { grid-template-columns: repeat(3, 1fr); }
+    .extras { grid-template-columns: 1fr 1fr; }
+    .header { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer">
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+</div>
+
+<div class="container">
+
+  <header class="header">
+    <div class="header-left">
+      <h1>Auckland</h1>
+      <p class="date" id="date"></p>
+    </div>
+    <div class="header-right">
+      <div>🇳🇿 Aotearoa</div>
+      <div id="time"></div>
+    </div>
+  </header>
+
+  <section class="hero" id="hero">
+    <div>
+      <div id="hero-temp" class="hero-temp"></div>
+      <div id="hero-condition" class="hero-condition"></div>
+      <div id="hero-hilo" class="hero-hilo"></div>
+    </div>
+    <div class="hero-details" id="hero-details"></div>
+  </section>
+
+  <h2 class="section-title">This Week</h2>
+  <section class="forecast" id="forecast"></section>
+
+  <section class="extras" id="extras"></section>
+
+  <footer class="footer">Data via Open-Meteo · Updated live</footer>
+
+</div>
+
+<script>
+// ─── WMO weather codes → icon + label ───
+const WMO = {
+  0:  { icon:'☀️',  label:'Clear Sky' },
+  1:  { icon:'🌤️', label:'Mostly Clear' },
+  2:  { icon:'⛅',  label:'Partly Cloudy' },
+  3:  { icon:'☁️',  label:'Overcast' },
+  45: { icon:'🌫️', label:'Fog' },
+  48: { icon:'🌫️', label:'Rime Fog' },
+  51: { icon:'🌦️', label:'Light Drizzle' },
+  53: { icon:'🌦️', label:'Drizzle' },
+  55: { icon:'🌧️', label:'Heavy Drizzle' },
+  61: { icon:'🌧️', label:'Light Rain' },
+  63: { icon:'🌧️', label:'Rain' },
+  65: { icon:'🌧️', label:'Heavy Rain' },
+  71: { icon:'🌨️', label:'Light Snow' },
+  73: { icon:'🌨️', label:'Snow' },
+  75: { icon:'❄️', label:'Heavy Snow' },
+  77: { icon:'🌨️', label:'Snow Grains' },
+  80: { icon:'🌦️', label:'Rain Showers' },
+  81: { icon:'🌧️', label:'Heavy Showers' },
+  82: { icon:'⛈️', label:'Violent Showers' },
+  85: { icon:'🌨️', label:'Snow Showers' },
+  86: { icon:'❄️', label:'Heavy Snow Showers' },
+  95: { icon:'⛈️', label:'Thunderstorm' },
+  96: { icon:'⛈️', label:'Hail Thunderstorm' },
+  99: { icon:'⛈️', label:'Severe Storm' },
+};
+
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+// ─── helpers ───
+function weatherLabel(code) {
+  return WMO[code] || { icon:'🌤️', label:'Partly Cloudy' };
+}
+
+function dayName(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  return DAYS[d.getDay()];
+}
+
+function isToday(iso) {
+  const now = new Date();
+  const d = new Date(iso + 'T00:00:00');
+  return now.toDateString() === d.toDateString();
+}
+
+function formatDate(d) {
+  const day = DAYS[d.getDay()];
+  const date = d.getDate();
+  const month = MONTHS[d.getMonth()];
+  return `${day}, ${month} ${date}`;
+}
+
+function windDir(speed) {
+  return speed > 30 ? 'Gusty' : speed > 15 ? 'Breezy' : 'Light';
+}
+
+// ─── fetch live weather ───
+async function fetchWeather() {
+  const url = 'https://api.open-meteo.com/v1/forecast'
+    + '?latitude=-36.85&longitude=174.76'
+    + '&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,rain_sum,showers_sum,snowfall_sum,weather_code,wind_speed_10m_max,wind_gusts_10m_max,relative_humidity_2m_max,uv_index_max'
+    + '&timezone=Pacific%2FAuckland&forecast_days=7';
+
+  const res = await fetch(url);
+  const data = await res.json();
+  return data.daily;
+}
+
+// ─── render ───
+function render(data) {
+  const now = new Date();
+  document.getElementById('date').textContent = formatDate(now);
+  document.getElementById('time').textContent =
+    now.toLocaleTimeString('en-NZ', { timeZone: 'Pacific/Auckland', hour:'2-digit',minute:'2-digit' });
+
+  // hero
+  const todayIdx = data.time.findIndex(t => isToday(t));
+  const idx = todayIdx >= 0 ? todayIdx : 0;
+  const t = data;
+  const hi = Math.round(t.temperature_2m_max[idx]);
+  const lo = Math.round(t.temperature_2m_min[idx]);
+  const code = t.weather_code[idx];
+  const w = weatherLabel(code);
+
+  document.getElementById('hero-temp').innerHTML = `${hi}<span class="hero-unit">°C</span>`;
+  document.getElementById('hero-condition').textContent = w.label;
+  document.getElementById('hero-hilo').innerHTML =
+    `<span class="hi">H:${hi}°</span><span class="lo">L:${lo}°</span>`;
+
+  document.getElementById('hero-details').innerHTML = [
+    { label:'Wind', value:`${Math.round(t.wind_speed_10m_max[idx])}`, unit:'km/h', sub:windDir(t.wind_speed_10m_max[idx]) },
+    { label:'Humidity', value:`${Math.round(t.relative_humidity_2m_max[idx])}`, unit:'%', sub:'' },
+    { label:'UV Index', value:`${Math.round(t.uv_index_max[idx])}`, unit:'', sub:uvLevel(t.uv_index_max[idx]) },
+    { label:'Precipitation', value:`${t.precipitation_sum[idx]}`, unit:'mm', sub:'' },
+  ].map(d => `
+    <div class="detail-item">
+      <span class="detail-label">${d.label}</span>
+      <span class="detail-value">${d.value} <span class="detail-unit">${d.unit}</span></span>
+      ${d.sub ? `<span style="color:var(--text-tertiary);font-size:13px">${d.sub}</span>` : ''}
+    </div>
+  `).join('');
+
+  // forecast
+  document.getElementById('forecast').innerHTML = data.time.map((date, i) => {
+    const w = weatherLabel(data.weather_code[i]);
+    const today = isToday(date);
+    return `
+      <div class="day-card${today ? ' today' : ''}">
+        <div class="day-name">${today ? 'Today' : dayName(date).slice(0,3)}</div>
+        <div class="day-icon">${w.icon}</div>
+        <div class="day-temp">${Math.round(data.temperature_2m_max[i])}°</div>
+        <div class="day-lo">${Math.round(data.temperature_2m_min[i])}°</div>
+        <div class="day-stats">
+          <span>💧 ${data.precipitation_sum[i]} mm</span>
+          ${data.snowfall_sum[i] > 0 ? `<span>❄️ ${data.snowfall_sum[i]} cm</span>` : ''}
+          <span>💨 ${Math.round(data.wind_speed_10m_max[i])} km/h</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // extras
+  const gusts = Math.round(Math.max(...data.wind_gusts_10m_max));
+  const totalRain = Math.round(data.precipitation_sum.reduce((a,b) => a+b, 0) * 10) / 10;
+  const avgHumidity = Math.round(data.relative_humidity_2m_max.reduce((a,b) => a+b, 0) / 7);
+  const snowTotal = Math.round(data.snowfall_sum.reduce((a,b) => a+b, 0) * 10) / 10;
+
+  document.getElementById('extras').innerHTML = [
+    { label:'Wind Gusts', value:`${gusts}`, unit:'km/h', sub:'Peak this week' },
+    { label:'Total Rain', value:`${totalRain}`, unit:'mm', sub:'This week' },
+    { label:'Avg Humidity', value:`${avgHumidity}`, unit:'%', sub:'This week' },
+    { label:'Snowfall', value:`${snowTotal}`, unit:'cm', sub:'This week' },
+  ].map(d => `
+    <div class="extra-card">
+      <div class="extra-label">${d.label}</div>
+      <div class="extra-value">${d.value} <span style="font-size:16px">${d.unit}</span></div>
+      <div class="extra-sub">${d.sub}</div>
+    </div>
+  `).join('');
+}
+
+function uvLevel(v) {
+  if (v <= 2) return 'Low';
+  if (v <= 5) return 'Moderate';
+  if (v <= 7) return 'High';
+  if (v <= 10) return 'Very High';
+  return 'Extreme';
+}
+
+// ─── boot ───
+(async () => {
+  try {
+    const data = await fetchWeather();
+    render(data);
+  } catch (e) {
+    console.error('Weather fetch failed', e);
+    document.getElementById('hero').innerHTML = '<p style="padding:40px">Unable to load weather data. Check your connection.</p>';
+  }
+})();
+</script>
+</body>
+</html>
